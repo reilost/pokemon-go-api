@@ -44,38 +44,23 @@ def get_acces_token(usr,pws,type):
 	return access_token,ltype
 	
 def main():
-	if platform.system() == 'Windows':
-		os.system("title Pokemon GO API Python")
-		os.system("cls")
-	else:
-		# Catches "Lunux" and "Darwin" (OSX), among others
-		os.system("clear")
-	parser = argparse.ArgumentParser()
-	parser.add_argument("-u", "--username", help="Login", default=None)
-	parser.add_argument("-p", "--password", help="Password", default=None)
-	parser.add_argument("-t", "--type", help="Google/PTC", required=True)
-	parser.add_argument("-l", "--location", help="Location", required=True)
-	#parser.add_argument("-d", "--distance", help="Distance", required=True)
-	args = parser.parse_args()
-	if not args.username:
-		args.username = getpass("Username: ")
-	if not args.password:
-		args.password = getpass("Password: ")
-	if 'ptc' in args.type.lower() or 'goo' in args.type.lower():
-		#config.distance=args.distance
-		access_token,ltype=get_acces_token(args.username,args.password,args.type.lower())
-		if access_token is not None:
-			if config.debug:
-				print '[!] using:',config.pub
-			if config.pub:
-				public.start_work(access_token,ltype,args.location)
-			else:
-				dirty.start_private_show(access_token,ltype,args.location)
+
+	poke_type = os.environ.get('POKE_TYPE', None)
+	poke_username = os.environ.get('POKE_USERNAME', None)
+	poke_password = os.environ.get('POKE_PASSWORD', None)
+	poke_location = os.environ.get('POKE_LOCATION', None)
+	print poke_location
+	access_token, ltype = get_acces_token(poke_username, poke_password, poke_type)
+	if access_token is not None:
+		if config.debug:
+			print '[!] using:',config.pub
+		if config.pub:
+			public.start_work(access_token,ltype, poke_location)
 		else:
-			print '[-] access_token bad'
+			dirty.start_private_show(access_token,ltype, poke_location)
 	else:
-		print '[!] used type "%s" only Google or PTC valid'%(args.type.lower())
-	
+		print '[-] access_token bad'
+
 if __name__ == '__main__':
 	sys.dont_write_bytecode = True
 	main()
